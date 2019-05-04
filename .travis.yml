@@ -1,0 +1,10 @@
+language: csharp
+mono: none
+dotnet: 2.1.602
+solution: dotnet-localization.sln
+install:
+  - dotnet restore
+script:
+  - dotnet restore
+  - dotnet build
+  - dotnet test Webinex.Receipts.Localization.Tests/Webinex.Receipts.Localization.Tests.csproj
