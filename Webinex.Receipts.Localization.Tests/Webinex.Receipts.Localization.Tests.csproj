@@ -7,6 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoFixture" Version="4.8.0" />
+        <PackageReference Include="AutoFixture.AutoMoq" Version="4.8.0" />
+        <PackageReference Include="AutoFixture.Xunit2" Version="4.8.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
         <PackageReference Include="morelinq" Version="3.1.1" />
         <PackageReference Include="xunit" Version="2.4.0" />
@@ -15,6 +18,21 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Webinex.Receipts.Localization.Core\Webinex.Receipts.Localization.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="_files\file_1.en.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="_files\file_1.en.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="_files\file_1.fr.yaml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="_files\file_2.en.yml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

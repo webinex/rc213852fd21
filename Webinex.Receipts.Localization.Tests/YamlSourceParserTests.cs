@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Webinex.Receipts.Localization.Core;
@@ -12,31 +13,21 @@ namespace Webinex.Receipts.Localization.Tests
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Document)))
             {
-                SourceNode result = new YamlSourceParser().Parse(stream);
-                SourceNodeEqualityAsserter.AssertNode(ExpectedResult, result);
+                var keyResolver = new UnderscoreKeyResolver();
+                var source = new FileSource("file.yml", "en", stream);
+                var result = new YamlSourceParser(keyResolver).Parse(source);
+                DictionaryAsserter.Equal(ExpectedResult, result);
             }
         }
 
-        private static readonly SourceNode ExpectedResult = SourceNode.Root(new[]
+        private static readonly IDictionary<string, string> ExpectedResult = new Dictionary<string, string>
         {
-            SourceNode.Nested("nested-1", new[]
-            {
-                SourceNode.Leap("key-1-1", "value-1-1")
-            }),
-            SourceNode.Nested("nested-2", new[]
-            {
-                SourceNode.Nested("nested-2-1", new[]
-                {
-                    SourceNode.Leap("key-2-1-1", "value-2-1-1")
-                }),
-                SourceNode.Nested("nested-2-2", new[]
-                {
-                    SourceNode.Leap("key-2-2-1", "value-2-2-1"),
-                    SourceNode.Leap("key-2-2-2", "value-2-2-2")
-                })
-            }),
-            SourceNode.Leap("leap-root", "value-leap-root")
-        });
+            ["nested-1_key-1-1"] = "value-1-1",
+            ["nested-2_nested-2-1_key-2-1-1"] = "value-2-1-1",
+            ["nested-2_nested-2-2_key-2-2-1"] = "value-2-2-1",
+            ["nested-2_nested-2-2_key-2-2-2"] = "value-2-2-2",
+            ["key-root"] = "value-root"
+        };
 
         private const string Document = @"
             nested-1:
@@ -47,7 +38,7 @@ namespace Webinex.Receipts.Localization.Tests
                 nested-2-2:
                     key-2-2-1: value-2-2-1
                     key-2-2-2: value-2-2-2
-            leap-root: value-leap-root
+            key-root: value-root
 ";
     }
 }

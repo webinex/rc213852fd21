@@ -1,87 +1,106 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MoreLinq;
 using YamlDotNet.RepresentationModel;
 
 namespace Webinex.Receipts.Localization.Core
 {
     public class YamlSourceParser : ISourceParser
     {
-        public SourceNode Parse(Stream source)
+        private readonly IKeyResolver _keyResolver;
+
+        public YamlSourceParser(IKeyResolver keyResolver)
         {
-            return new Parser(source).Parse();
+            _keyResolver = keyResolver ?? throw new ArgumentNullException(nameof(keyResolver));
+        }
+
+        public IDictionary<string, string> Parse(ISource source)
+        {
+            source = source ?? throw new ArgumentNullException(nameof(source));
+            return new Parser(_keyResolver, source).Parse();
         }
 
         private class Parser
         {
-            private readonly Stream _stream;
-            private YamlStream _yaml;
-            
-            public Parser(Stream stream)
+            private readonly ISource _source;
+            private readonly IKeyResolver _keyResolver;
+
+            public Parser(IKeyResolver keyResolver, ISource source)
             {
-                _stream = stream;
+                _keyResolver = keyResolver ?? throw new ArgumentNullException(nameof(keyResolver));
+                _source = source ?? throw new ArgumentNullException(nameof(source));
             }
 
-            public SourceNode Parse()
+            public IDictionary<string, string> Parse()
             {
-                _yaml = new YamlStream();
-                using (var reader = new StreamReader(_stream))
+                var yaml = new YamlStream();
+                using (var reader = new StreamReader(_source.Stream))
                 {
-                    _yaml.Load(reader);
-                    return ParseYamlTree();
+                    yaml.Load(reader);
+                    return VisitYamlTree(yaml);
                 }
             }
 
-            private SourceNode ParseYamlTree()
+            private IDictionary<string, string> VisitYamlTree(YamlStream yaml)
             {
-                var rootNode = (YamlMappingNode)_yaml.Documents[0].RootNode;
+                var rootNode = (YamlMappingNode) yaml.Documents[0].RootNode;
                 return VisitRootNode(rootNode);
             }
 
-            private SourceNode VisitRootNode(YamlMappingNode rootNode)
+            private IDictionary<string, string> VisitRootNode(YamlMappingNode rootNode)
             {
-                LinkedList<SourceNode> children = VisitMappingNodeChildren(rootNode);
-                return SourceNode.Root(children);
+                return new Dictionary<string, string>(
+                    VisitMappingNodeChildren(null, null, rootNode));
             }
 
-            private SourceNode VisitNode(KeyValuePair<YamlNode, YamlNode> nodePair)
+            private LinkedList<KeyValuePair<string, string>> VisitNode(NodeDetails details)
             {
-                switch (nodePair.Value.NodeType)
+                switch (details.Value.NodeType)
                 {
                     case YamlNodeType.Scalar:
-                        return VisitScalarNode(nodePair);
+                        var result = new LinkedList<KeyValuePair<string, string>>();
+                        result.AddLast(VisitScalarNode(details));
+                        return result;
                     case YamlNodeType.Mapping:
-                        return VisitMappingNode(nodePair);
+                        return VisitMappingNode(details);
                     default:
-                        throw new ArgumentException($"Invalid {nameof(YamlSourceParser)} source. Only objects and scalars supported." + 
-                                        $"{Environment.NewLine}Received: {nodePair.Value.NodeType}");
+                        throw new ArgumentException(
+                            $"Invalid {nameof(YamlSourceParser)} source. " +
+                            $"Only objects and scalars supported.{Environment.NewLine}" +
+                            $"Received: {details.Value.NodeType}");
                 }
-                
             }
 
-            private SourceNode VisitScalarNode(KeyValuePair<YamlNode, YamlNode> nodePair)
+            private LinkedList<KeyValuePair<string, string>> VisitMappingNode(NodeDetails details)
             {
-                return SourceNode.Leap(
-                    GetScalarNodeKey(nodePair.Key),
-                    GetScalarNodeValue(nodePair.Value));
+                return VisitMappingNodeChildren(details);
             }
 
-            private SourceNode VisitMappingNode(KeyValuePair<YamlNode, YamlNode> nodePair)
+            private LinkedList<KeyValuePair<string, string>> VisitMappingNodeChildren(NodeDetails details)
             {
-                var result = VisitMappingNodeChildren(nodePair.Value);
-                return SourceNode.Nested(GetScalarNodeKey(nodePair.Key), result);
+                var mappingNode = (YamlMappingNode) details.Value;
+                return VisitMappingNodeChildren(GetScalarNodeKey(details.Key), details.Path, mappingNode);
             }
 
-            private LinkedList<SourceNode> VisitMappingNodeChildren(YamlNode nodeValue)
+            private LinkedList<KeyValuePair<string, string>> VisitMappingNodeChildren(string key, string[] path, YamlMappingNode value)
             {
-                LinkedList<SourceNode> result = new LinkedList<SourceNode>();
-                var mappingNode = (YamlMappingNode) nodeValue;
-                foreach (var childNodePair in mappingNode.Children)
+                var result = new LinkedList<KeyValuePair<string, string>>();
+                var childPath = NodeDetails.NextPath(path, key);
+                foreach (var childNodePair in value.Children)
                 {
-                    result.AddLast(VisitNode(childNodePair));
+                    VisitNode(new NodeDetails(childNodePair, childPath)).ForEach(item => result.AddLast(item));
                 }
 
                 return result;
+                
+            }
+
+            private KeyValuePair<string, string> VisitScalarNode(NodeDetails details)
+            {
+                return KeyValuePair.Create(
+                    GetEntryKey(details),
+                    GetScalarNodeValue(details.Value));
             }
 
             private string GetScalarNodeValue(YamlNode node)
@@ -90,7 +109,14 @@ namespace Webinex.Receipts.Localization.Core
                 {
                     return scalarNode.Value;
                 }
-                throw new ArgumentException($"Unexpected node type nodes. Expected {nameof(YamlScalarNode)}. Received: {node.GetType().Name}");
+
+                throw new ArgumentException(
+                    $"Unexpected node type nodes. Expected {nameof(YamlScalarNode)}. Received: {node.GetType().Name}");
+            }
+
+            private string GetEntryKey(NodeDetails details)
+            {
+                return _keyResolver.Resolve(new EntryPath(GetScalarNodeKey(details.Key), details.Path, _source));
             }
 
             private string GetScalarNodeKey(YamlNode node)
@@ -99,7 +125,47 @@ namespace Webinex.Receipts.Localization.Core
                 {
                     return scalarNode.Value;
                 }
+
                 throw new ArgumentException($"Keys should be scalar nodes. Received: {node.GetType().Name}");
+            }
+        }
+
+        private class NodeDetails
+        {
+            public YamlNode Key { get; }
+
+            public YamlNode Value { get; }
+
+            public string[] Path { get; }
+
+            public NodeDetails(KeyValuePair<YamlNode, YamlNode> nodePair, string[] path)
+                : this(nodePair.Key, nodePair.Value, path)
+            {
+            }
+
+            public NodeDetails(YamlNode key, YamlNode value, string[] path)
+            {
+                Key = key;
+                Value = value;
+                Path = path ?? new string[0];
+            }
+
+            public static string[] NextPath(string[] path, string next)
+            {
+                if (string.IsNullOrWhiteSpace(next))
+                {
+                    return path;
+                }
+
+                if (path == null)
+                {
+                    return new[] { next };
+                }
+                
+                var newPath = new string[path.Length + 1];
+                path.CopyTo(newPath, 0);
+                newPath[newPath.Length - 1] = next;
+                return newPath;
             }
         }
     }

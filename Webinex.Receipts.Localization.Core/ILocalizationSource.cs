@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace Webinex.Receipts.Localization.Core
 {
-    public interface ISourceParser
+    public interface ILocalizationSource
     {
-        IDictionary<string, string> Parse(ISource source);
+        ILocalizationData Load();
     }
 }
