@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.Data
 {
     public interface ILocalizationData
     {

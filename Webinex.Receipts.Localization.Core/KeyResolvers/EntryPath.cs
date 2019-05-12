@@ -1,6 +1,6 @@
 using System;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.Sources
 {
     public class EntryPath : IEntryPath
     {

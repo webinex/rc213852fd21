@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Webinex.Receipts.Localization.Core;
+using Webinex.Receipts.Localization.Core.KeyResolvers;
+using Webinex.Receipts.Localization.Core.SourceParsers;
+using Webinex.Receipts.Localization.Core.Sources;
 using Xunit;
 
 namespace Webinex.Receipts.Localization.Tests

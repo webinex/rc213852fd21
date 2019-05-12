@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.Lang
 {
     internal static class EnumerableDisposerExtension
     {

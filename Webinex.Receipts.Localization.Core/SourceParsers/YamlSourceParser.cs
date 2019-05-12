@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MoreLinq;
+using Webinex.Receipts.Localization.Core.KeyResolvers;
+using Webinex.Receipts.Localization.Core.Sources;
 using YamlDotNet.RepresentationModel;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.SourceParsers
 {
     public class YamlSourceParser : ISourceParser
     {

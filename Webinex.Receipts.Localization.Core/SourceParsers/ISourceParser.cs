@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Webinex.Receipts.Localization.Core.Sources;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.SourceParsers
 {
     public interface ISourceParser
     {

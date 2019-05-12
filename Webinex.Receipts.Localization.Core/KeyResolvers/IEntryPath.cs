@@ -1,4 +1,4 @@
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.Sources
 {
     public interface IEntryPath
     {

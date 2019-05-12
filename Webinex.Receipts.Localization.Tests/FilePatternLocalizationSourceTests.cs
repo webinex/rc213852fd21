@@ -6,6 +6,8 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using Webinex.Receipts.Localization.Core;
+using Webinex.Receipts.Localization.Core.SourceParsers;
+using Webinex.Receipts.Localization.Core.Sources;
 using Xunit;
 
 namespace Webinex.Receipts.Localization.Tests

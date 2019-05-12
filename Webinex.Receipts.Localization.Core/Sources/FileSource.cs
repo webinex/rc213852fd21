@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.Sources
 {
     public class FileSource : ISource, IDisposable
     {
-        public IDictionary<string, string> Metadata { get; }
+        public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
         
         public string Lang { get; }
 
@@ -14,10 +14,10 @@ namespace Webinex.Receipts.Localization.Core
 
         public FileSource(string fileName, string lang, Stream stream)
         {
-            Metadata = new Dictionary<string, string>();
             Lang = lang ?? throw new ArgumentNullException(nameof(lang));
             Stream = stream ?? throw new ArgumentNullException(nameof(stream));
             fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+            
             Metadata["fileName"] = fileName;
         }
 

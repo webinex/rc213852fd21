@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MoreLinq;
+using Webinex.Receipts.Localization.Core.Data;
+using Webinex.Receipts.Localization.Core.SourceParsers;
 
-namespace Webinex.Receipts.Localization.Core
+namespace Webinex.Receipts.Localization.Core.Sources
 {
     public class FilePatternLocalizationSource : ILocalizationSource
     {
         private readonly string _path;
-        private readonly IEnumerable<string> _sourcePatterns;
         private readonly string _lang;
+        private readonly IEnumerable<string> _sourcePatterns;
         private readonly ISourceParser _sourceParser;
 
         public FilePatternLocalizationSource(string path, string lang, IEnumerable<string> sourcePatterns, ISourceParser sourceParser)
