@@ -1,5 +1,4 @@
 using System.IO;
-using Webinex.Receipts.Localization.Core;
 using Webinex.Receipts.Localization.Core.KeyResolvers;
 using Webinex.Receipts.Localization.Core.Sources;
 using Xunit;

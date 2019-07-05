@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MoreLinq;
 using Webinex.Receipts.Localization.Core.KeyResolvers;
 using Webinex.Receipts.Localization.Core.Sources;
@@ -46,8 +47,8 @@ namespace Webinex.Receipts.Localization.Core.SourceParsers
 
             private IDictionary<string, string> VisitYamlTree(YamlStream yaml)
             {
-                var rootNode = (YamlMappingNode) yaml.Documents[0].RootNode;
-                return VisitRootNode(rootNode);
+                return yaml.Documents.SelectMany(document => VisitRootNode((YamlMappingNode) document.RootNode))
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
             }
 
             private IDictionary<string, string> VisitRootNode(YamlMappingNode rootNode)

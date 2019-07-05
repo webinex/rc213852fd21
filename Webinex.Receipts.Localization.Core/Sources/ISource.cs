@@ -7,8 +7,6 @@ namespace Webinex.Receipts.Localization.Core.Sources
     {
         IDictionary<string, string> Metadata { get; }
         
-        string Lang { get; }
-        
         Stream Stream { get; }
     }
 }
