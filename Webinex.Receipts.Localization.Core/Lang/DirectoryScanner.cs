@@ -43,17 +43,17 @@ namespace Webinex.Receipts.Localization.Core.Lang
             if (_pattern.Contains("**"))
             {
                 _searchOption = SearchOption.AllDirectories;
-                _baseDir = _pattern.Substring(0, _pattern.IndexOf("\\**", StringComparison.InvariantCulture) + 1);
+                _baseDir = _pattern.Substring(0, _pattern.IndexOf($"{Path.DirectorySeparatorChar}**", StringComparison.InvariantCulture) + 1);
                 return;
             }
 
             _searchOption = SearchOption.TopDirectoryOnly;
-            _baseDir = _pattern.Substring(0, _pattern.LastIndexOf('\\') + 1);
+            _baseDir = _pattern.Substring(0, _pattern.LastIndexOf(Path.DirectorySeparatorChar) + 1);
         }
 
         private void InitSearchPatterns()
         {
-            var index = _pattern.LastIndexOf("\\", StringComparison.InvariantCulture);
+            var index = _pattern.LastIndexOf(Path.DirectorySeparatorChar);
             var filePattern = _pattern.Substring(index + 1);
             var result = new LinkedList<string>();
 

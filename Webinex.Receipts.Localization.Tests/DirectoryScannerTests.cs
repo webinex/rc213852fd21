@@ -14,7 +14,7 @@ namespace Webinex.Receipts.Localization.Tests
             GetPath("_files", "file_2.en.yml"),
         };
 
-        private string InputOfCompleteOptions => GetPath("**\\*.en.(yaml|yml)");
+        private string InputOfCompleteOptions => GetPath("**", "*.en.(yaml|yml)");
         
         [Fact]
         public void CompleteOptionsShouldWorksCorrectly()
@@ -44,7 +44,7 @@ namespace Webinex.Receipts.Localization.Tests
             GetPath("_files", "file_1.en.json"),
         };
         
-        private string InputOfExtensionOnlySearch => GetPath("_files\\file_1.en.(yaml|json)");
+        private string InputOfExtensionOnlySearch => GetPath("_files", "file_1.en.(yaml|json)");
 
         [Fact]
         public void ExtensionOnlySearchShouldWorksCorrectly()
@@ -59,7 +59,7 @@ namespace Webinex.Receipts.Localization.Tests
             GetPath("_files", "file_2.en.yml"),
         };
         
-        private string InputOfPatternAndExtensionSearch => GetPath("_files\\*.en.(yml|json)");
+        private string InputOfPatternAndExtensionSearch => GetPath("_files", "*.en.(yml|json)");
 
         [Fact]
         public void PatternAndExtensionTestShouldWorksCorrectly()
@@ -73,7 +73,7 @@ namespace Webinex.Receipts.Localization.Tests
             GetPath("_files", "file_1.en.yaml"),
         };
         
-        private string InputOfConcreteFileSearch => GetPath("_files\\file_1.en.yaml");
+        private string InputOfConcreteFileSearch => GetPath("_files", "file_1.en.yaml");
 
         [Fact]
         public void ConcreteFileSearchShouldWorksCorrectly()
@@ -87,7 +87,7 @@ namespace Webinex.Receipts.Localization.Tests
             GetPath("_files", "file_1.fr.yaml"),
         };
         
-        private string InputOfOfPatternOnlySearch => GetPath("_files\\*.yaml");
+        private string InputOfOfPatternOnlySearch => GetPath("_files", "*.yaml");
         
 
         [Fact]
